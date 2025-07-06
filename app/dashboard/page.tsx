@@ -18,7 +18,7 @@ export default function DashboardPage() {
     { name: 'Lisa Davis', email: 'lisa@example.com', status: 'Calling', date: '15 min ago' },
   ]
 
-  return (
+ return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
