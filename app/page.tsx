@@ -15,12 +15,12 @@ export default function HomePage() {
               <span className="ml-2 text-xl font-bold text-gray-900">MERGE AI</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/login" className="btn-secondary">
-                Sign In
-              </Link>
-              <Link href="/login" className="btn-primary">
-                Get Started
-              </Link>
+           <Link href="/login" className="text-gray-600 hover:text-gray-900 px-4 py-2">
+  Sign In
+</Link>
+<Link href="/dashboard" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+  Get Started
+</Link>
             </div>
           </div>
         </nav>
@@ -41,13 +41,13 @@ export default function HomePage() {
                   From voice confirmation to form submission - completely automated.
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
-                  <Link href="/login" className="btn-primary">
-                    Get Started
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                  <button className="btn-secondary">
-                    Watch Demo
-                  </button>
+                <Link href="/dashboard" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex items-center">
+  Get Started
+  <ArrowRight className="ml-2 h-4 w-4" />
+</Link>
+<button className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50">
+  Watch Demo
+</button>
                 </div>
               </div>
             </div>
