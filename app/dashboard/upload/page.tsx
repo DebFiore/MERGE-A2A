@@ -1,8 +1,53 @@
-import React from 'react'
-import Link from 'next/link'
-import { Bot, Upload, FileText, CheckCircle, ArrowLeft } from 'lucide-react'
+'use client'
 
-export default function UploadLeadsPage() {
+import { useState } from 'react'
+import Link from 'next/link'
+import { Bot, Upload, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react'
+
+export default function UploadPage() {
+  const [file, setFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploaded, setUploaded] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0]
+    if (selectedFile) {
+      // Check if it's a CSV file
+      if (selectedFile.type === 'text/csv' || selectedFile.name.endsWith('.csv')) {
+        setFile(selectedFile)
+        setError('')
+      } else {
+        setError('Please select a CSV file')
+        setFile(null)
+      }
+    }
+  }
+
+  const handleUpload = async () => {
+    if (!file) return
+    
+    setUploading(true)
+    setError('')
+    
+    // Simulate upload process
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000)) // 2 second delay
+      setUploaded(true)
+      setUploading(false)
+    } catch (err) {
+      setError('Upload failed. Please try again.')
+      setUploading(false)
+    }
+  }
+
+  const resetUpload = () => {
+    setFile(null)
+    setUploaded(false)
+    setError('')
+    setUploading(false)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -14,140 +59,137 @@ export default function UploadLeadsPage() {
               <span className="ml-2 text-xl font-bold text-gray-900">MERGE AI</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Welcome back, User!</span>
-              <Link href="/login" className="text-gray-400 hover:text-gray-500">
-                <ArrowLeft className="h-5 w-5" />
+              <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-gray-900">
+                <ArrowLeft className="h-5 w-5 mr-2" />
+                Back to Dashboard
               </Link>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="hidden md:flex md:w-64 md:flex-col">
-          <div className="flex flex-col flex-grow bg-white border-r border-gray-200 pt-5 pb-4 overflow-y-auto">
-            <div className="flex items-center flex-shrink-0 px-4">
-              <span className="text-lg font-semibold text-gray-900">Dashboard</span>
-            </div>
-            <div className="mt-5 flex-grow flex flex-col">
-              <nav className="flex-1 px-2 space-y-1">
-                <Link href="/dashboard" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
-                  <CheckCircle className="text-gray-400 mr-3 h-5 w-5" />
-                  Overview
-                </Link>
-                <a href="#" className="bg-blue-50 border-blue-500 text-blue-700 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
-                  <Upload className="text-blue-500 mr-3 h-5 w-5" />
-                  Upload Leads
-                </a>
-                <a href="#" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
-                  <FileText className="text-gray-400 mr-3 h-5 w-5" />
-                  Campaigns
-                </a>
-                <a href="#" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
-                  <Bot className="text-gray-400 mr-3 h-5 w-5" />
-                  Settings
-                </a>
-              </nav>
-            </div>
-          </div>
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Upload Leads</h1>
+          <p className="mt-2 text-gray-600">Upload a CSV file containing your lead data</p>
         </div>
 
-        {/* Main content */}
-        <div className="flex flex-col flex-1">
-          <main className="flex-1">
-            <div className="py-6">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">Upload Leads</h1>
-                <p className="mt-2 text-sm text-gray-600">Upload your leads via CSV to start the AI-powered qualification process.</p>
-              </div>
-
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                {/* Upload Area */}
-                <div className="mt-6">
-                  <div className="bg-white shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        CSV File Upload
-                      </h3>
-                      
-                      {/* Upload Box */}
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-gray-400 transition-colors">
-                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                        <div className="mt-4">
-                          <p className="text-lg text-gray-600">Drop your CSV file here, or</p>
-                          <button className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                            Browse Files
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* CSV Format Requirements */}
-                      <div className="mt-8">
-                        <h4 className="text-md font-medium text-gray-900 mb-3">Required CSV Format</h4>
-                        <div className="bg-gray-50 rounded-md p-4">
-                          <p className="text-sm text-gray-600 mb-2">Your CSV file must include these columns:</p>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <strong>Required Fields:</strong>
-                              <ul className="mt-1 text-gray-600">
-                                <li>• firstName</li>
-                                <li>• lastName</li>
-                                <li>• email</li>
-                                <li>• phone</li>
-                              </ul>
-                            </div>
-                            <div>
-                              <strong>Optional Fields:</strong>
-                              <ul className="mt-1 text-gray-600">
-                                <li>• state</li>
-                                <li>• city</li>
-                                <li>• zipCode</li>
-                                <li>• areaOfStudy</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Process Steps */}
-                      <div className="mt-8">
-                        <h4 className="text-md font-medium text-gray-900 mb-3">What Happens Next</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="text-center p-4 bg-blue-50 rounded-lg">
-                            <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2">1</div>
-                            <h5 className="font-medium text-gray-900">Upload Processing</h5>
-                            <p className="text-sm text-gray-600 mt-1">Leads validated and imported</p>
-                          </div>
-                          <div className="text-center p-4 bg-green-50 rounded-lg">
-                            <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-2">2</div>
-                            <h5 className="font-medium text-gray-900">AI Voice Calls</h5>
-                            <p className="text-sm text-gray-600 mt-1">Zoe confirms lead data</p>
-                          </div>
-                          <div className="text-center p-4 bg-purple-50 rounded-lg">
-                            <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-2">3</div>
-                            <h5 className="font-medium text-gray-900">Auto Submission</h5>
-                            <p className="text-sm text-gray-600 mt-1">Forms submitted to portals</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="mt-8 flex justify-between">
-                        <Link href="/dashboard" className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                          <ArrowLeft className="mr-2 h-4 w-4" />
-                          Back to Dashboard
-                        </Link>
-                        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                          Start Processing
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          {!uploaded ? (
+            <div className="space-y-6">
+              {/* File Upload Area */}
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="mt-4">
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <span className="mt-2 block text-sm font-medium text-gray-900">
+                      Drop your CSV file here, or{' '}
+                      <span className="text-blue-600 hover:text-blue-500">browse files</span>
+                    </span>
+                    <input
+                      id="file-upload"
+                      name="file-upload"
+                      type="file"
+                      accept=".csv"
+                      className="sr-only"
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                  <p className="mt-1 text-xs text-gray-500">CSV files only, up to 10MB</p>
                 </div>
               </div>
+
+              {/* Selected File Display */}
+              {file && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-600" />
+                      <span className="ml-2 text-sm font-medium text-blue-900">
+                        {file.name}
+                      </span>
+                      <span className="ml-2 text-sm text-blue-700">
+                        ({(file.size / 1024).toFixed(1)} KB)
+                      </span>
+                    </div>
+                    <button
+                      onClick={resetUpload}
+                      className="text-blue-600 hover:text-blue-800 text-sm"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Error Display */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <AlertCircle className="h-5 w-5 text-red-600" />
+                    <span className="ml-2 text-sm text-red-800">{error}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <div className="flex justify-end">
+                <button
+                  onClick={handleUpload}
+                  disabled={!file || uploading}
+                  className={`px-6 py-3 rounded-lg font-medium ${
+                    file && !uploading
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {uploading ? 'Uploading...' : 'Upload Leads'}
+                </button>
+              </div>
             </div>
-          </main>
+          ) : (
+            /* Success State */
+            <div className="text-center py-8">
+              <CheckCircle className="mx-auto h-16 w-16 text-green-600" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900">Upload Successful!</h3>
+              <p className="mt-2 text-gray-600">
+                Your leads have been uploaded and are being processed.
+              </p>
+              <div className="mt-6 space-x-4">
+                <button
+                  onClick={resetUpload}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  Upload Another File
+                </button>
+                <Link
+                  href="/dashboard"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Back to Dashboard
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Instructions */}
+        <div className="mt-8 bg-gray-50 rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">CSV Format Requirements</h3>
+          <div className="text-sm text-gray-600 space-y-2">
+            <p>Your CSV file should include the following columns:</p>
+            <ul className="list-disc list-inside ml-4 space-y-1">
+              <li><strong>name</strong> - Lead's full name</li>
+              <li><strong>email</strong> - Lead's email address</li>
+              <li><strong>phone</strong> - Lead's phone number (optional)</li>
+              <li><strong>company</strong> - Lead's company name (optional)</li>
+              <li><strong>status</strong> - Lead status (e.g., "New", "Contacted", "Qualified")</li>
+            </ul>
+            <p className="mt-4">
+              <strong>Example:</strong> name,email,phone,company,status
+            </p>
+          </div>
         </div>
       </div>
     </div>
