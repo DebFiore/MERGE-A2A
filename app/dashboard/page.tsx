@@ -30,9 +30,9 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">Welcome back, User!</span>
-              <Link href="/login" className="text-gray-400 hover:text-gray-500">
+             <a href="/login" className="text-gray-400 hover:text-gray-500">
                 <LogOut className="h-5 w-5" />
-              </Link>
+              </a>
             </div>
           </div>
         </div>
