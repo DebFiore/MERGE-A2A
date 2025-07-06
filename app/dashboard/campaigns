@@ -1,0 +1,284 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { Bot, ArrowLeft, Plus, Users, Phone, CheckCircle, BarChart3, Calendar, Edit, Trash2, Play, Pause } from 'lucide-react'
+
+export default function CampaignsPage() {
+  const [activeTab, setActiveTab] = useState('active')
+
+  const campaigns = [
+    {
+      id: 1,
+      name: 'Spring 2025 Enrollment',
+      status: 'active',
+      leadsTotal: 1245,
+      leadsProcessed: 892,
+      leadsConverted: 234,
+      conversionRate: '26.2%',
+      createdDate: '2025-01-15',
+      lastActivity: '2 hours ago'
+    },
+    {
+      id: 2,
+      name: 'Healthcare Programs Q1',
+      status: 'active',
+      leadsTotal: 856,
+      leadsProcessed: 654,
+      leadsConverted: 189,
+      conversionRate: '28.9%',
+      createdDate: '2025-01-10',
+      lastActivity: '30 minutes ago'
+    },
+    {
+      id: 3,
+      name: 'Business MBA Campaign',
+      status: 'paused',
+      leadsTotal: 432,
+      leadsProcessed: 432,
+      leadsConverted: 98,
+      conversionRate: '22.7%',
+      createdDate: '2024-12-20',
+      lastActivity: '1 day ago'
+    },
+    {
+      id: 4,
+      name: 'Tech Bootcamp Winter',
+      status: 'completed',
+      leadsTotal: 678,
+      leadsProcessed: 678,
+      leadsConverted: 156,
+      conversionRate: '23.0%',
+      createdDate: '2024-12-01',
+      lastActivity: '5 days ago'
+    }
+  ]
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'bg-green-100 text-green-800'
+      case 'paused': return 'bg-yellow-100 text-yellow-800'
+      case 'completed': return 'bg-blue-100 text-blue-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <Play className="h-4 w-4" />
+      case 'paused': return <Pause className="h-4 w-4" />
+      case 'completed': return <CheckCircle className="h-4 w-4" />
+      default: return <Calendar className="h-4 w-4" />
+    }
+  }
+
+  const filteredCampaigns = campaigns.filter(campaign => {
+    if (activeTab === 'all') return true
+    return campaign.status === activeTab
+  })
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center">
+              <Bot className="h-8 w-8 text-blue-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">MERGE AI</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-gray-900">
+                <ArrowLeft className="h-5 w-5 mr-2" />
+                Back to Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Campaigns</h1>
+            <p className="mt-2 text-gray-600">Manage your lead generation campaigns</p>
+          </div>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+            <Plus className="h-5 w-5 mr-2" />
+            New Campaign
+          </button>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <BarChart3 className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Total Campaigns</p>
+                <p className="text-2xl font-semibold text-gray-900">4</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Users className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Total Leads</p>
+                <p className="text-2xl font-semibold text-gray-900">3,211</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Phone className="h-8 w-8 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Processed</p>
+                <p className="text-2xl font-semibold text-gray-900">2,656</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <CheckCircle className="h-8 w-8 text-orange-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Converted</p>
+                <p className="text-2xl font-semibold text-gray-900">677</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="border-b border-gray-200">
+            <nav className="flex">
+              {['all', 'active', 'paused', 'completed'].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-3 text-sm font-medium border-b-2 ${
+                    activeTab === tab
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)} Campaigns
+                  <span className="ml-2 px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600">
+                    {tab === 'all' ? campaigns.length : campaigns.filter(c => c.status === tab).length}
+                  </span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Campaigns Table */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Campaign
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Progress
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Conversion Rate
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Last Activity
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredCampaigns.map((campaign) => (
+                  <tr key={campaign.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{campaign.name}</div>
+                        <div className="text-sm text-gray-500">Created {campaign.createdDate}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
+                        {getStatusIcon(campaign.status)}
+                        <span className="ml-1 capitalize">{campaign.status}</span>
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {campaign.leadsProcessed} / {campaign.leadsTotal} leads
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div 
+                          className="bg-blue-600 h-2 rounded-full" 
+                          style={{ width: `${(campaign.leadsProcessed / campaign.leadsTotal) * 100}%` }}
+                        ></div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{campaign.conversionRate}</div>
+                      <div className="text-sm text-gray-500">{campaign.leadsConverted} converted</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {campaign.lastActivity}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button className="text-blue-600 hover:text-blue-900">
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button className="text-gray-400 hover:text-gray-600">
+                          {campaign.status === 'active' ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                        </button>
+                        <button className="text-red-600 hover:text-red-900">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Empty State */}
+        {filteredCampaigns.length === 0 && (
+          <div className="text-center py-12">
+            <Users className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No {activeTab} campaigns</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Get started by creating a new campaign.
+            </p>
+            <div className="mt-6">
+              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center mx-auto">
+                <Plus className="h-5 w-5 mr-2" />
+                New Campaign
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
