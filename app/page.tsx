@@ -1,4 +1,6 @@
+import React from 'react'
 import Link from 'next/link'
+
 import { Bot, ArrowRight, Phone, FileText, Target } from 'lucide-react'
 
 export default function HomePage() {
