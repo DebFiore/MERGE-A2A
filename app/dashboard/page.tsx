@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Bot, Users, Phone, CheckCircle, Upload, BarChart3, Settings, LogOut } from 'lucide-react'
 
