@@ -1,8 +1,25 @@
-import React from 'react'
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { Bot, Settings, FileText, CheckCircle, ArrowLeft, Upload, Save } from 'lucide-react'
+import { Bot, ArrowLeft, Save, User, Bell, Shield, Database } from 'lucide-react'
 
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState('profile')
+  const [saved, setSaved] = useState(false)
+
+  const handleSave = () => {
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
+  }
+
+  const tabs = [
+    { id: 'profile', name: 'Profile', icon: User },
+    { id: 'notifications', name: 'Notifications', icon: Bell },
+    { id: 'security', name: 'Security', icon: Shield },
+    { id: 'data', name: 'Data & Export', icon: Database },
+  ]
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -14,195 +31,219 @@ export default function SettingsPage() {
               <span className="ml-2 text-xl font-bold text-gray-900">MERGE AI</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Welcome back, User!</span>
-              <Link href="/login" className="text-gray-400 hover:text-gray-500">
-                <ArrowLeft className="h-5 w-5" />
+              <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-gray-900">
+                <ArrowLeft className="h-5 w-5 mr-2" />
+                Back to Dashboard
               </Link>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="hidden md:flex md:w-64 md:flex-col">
-          <div className="flex flex-col flex-grow bg-white border-r border-gray-200 pt-5 pb-4 overflow-y-auto">
-            <div className="flex items-center flex-shrink-0 px-4">
-              <span className="text-lg font-semibold text-gray-900">Dashboard</span>
-            </div>
-            <div className="mt-5 flex-grow flex flex-col">
-              <nav className="flex-1 px-2 space-y-1">
-                <Link href="/dashboard" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
-                  <CheckCircle className="text-gray-400 mr-3 h-5 w-5" />
-                  Overview
-                </Link>
-                <Link href="/dashboard/upload" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
-                  <Upload className="text-gray-400 mr-3 h-5 w-5" />
-                  Upload Leads
-                </Link>
-                <a href="#" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
-                  <FileText className="text-gray-400 mr-3 h-5 w-5" />
-                  Campaigns
-                </a>
-                <a href="#" className="bg-blue-50 border-blue-500 text-blue-700 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
-                  <Settings className="text-blue-500 mr-3 h-5 w-5" />
-                  Settings
-                </a>
-              </nav>
-            </div>
-          </div>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+          <p className="mt-2 text-gray-600">Manage your account preferences and configurations</p>
         </div>
 
-        {/* Main content */}
-        <div className="flex flex-col flex-1">
-          <main className="flex-1">
-            <div className="py-6">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-                <p className="mt-2 text-sm text-gray-600">Configure your MERGE AI platform settings and integrations.</p>
-              </div>
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="flex">
+            {/* Sidebar Navigation */}
+            <div className="w-64 bg-gray-50 border-r border-gray-200">
+              <nav className="p-4 space-y-2">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg ${
+                        activeTab === tab.id
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5 mr-3" />
+                      {tab.name}
+                    </button>
+                  )
+                })}
+              </nav>
+            </div>
 
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Content Area */}
+            <div className="flex-1 p-8">
+              {/* Profile Tab */}
+              {activeTab === 'profile' && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
                   
-                  {/* Account Settings */}
-                  <div className="bg-white shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        Account Settings
-                      </h3>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Company Name</label>
-                          <input type="text" defaultValue="MERGE AI Demo" className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Contact Email</label>
-                          <input type="email" defaultValue="user@mergeai.com" className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Time Zone</label>
-                          <select className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
-                            <option>Eastern Time (ET)</option>
-                            <option>Central Time (CT)</option>
-                            <option>Mountain Time (MT)</option>
-                            <option>Pacific Time (PT)</option>
-                          </select>
-                        </div>
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        defaultValue="John"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        defaultValue="Doe"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        defaultValue="john@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Company
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        defaultValue="MERGE AI"
+                      />
                     </div>
                   </div>
-
-                  {/* VAPI Integration */}
-                  <div className="bg-white shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        VAPI.AI Integration
-                      </h3>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">API Key</label>
-                          <input type="password" placeholder="••••••••••••••••" className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Voice Agent ID</label>
-                          <input type="text" defaultValue="agent_zoe_v1" className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" />
-                        </div>
-                        
-                        <div className="flex items-center">
-                          <input type="checkbox" className="h-4 w-4 text-blue-600 rounded" defaultChecked />
-                          <label className="ml-2 text-sm text-gray-700">Enable automatic calling</label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* LeadHoop Integration */}
-                  <div className="bg-white shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        LeadHoop Integration
-                      </h3>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Portal URL</label>
-                          <input type="url" defaultValue="https://ieim-portal.leadhoop.com" className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Form ID</label>
-                          <input type="text" defaultValue="aSuRzy0E8XWWKeLJngoDiQ" className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Default Area of Study</label>
-                          <select className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
-                            <option>Business Administration</option>
-                            <option>Healthcare</option>
-                            <option>Technology</option>
-                            <option>Education</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Call Schedule */}
-                  <div className="bg-white shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        Calling Schedule
-                      </h3>
-                      
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">Start Time</label>
-                            <input type="time" defaultValue="09:00" className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">End Time</label>
-                            <input type="time" defaultValue="17:00" className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" />
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Active Days</label>
-                          <div className="grid grid-cols-7 gap-2">
-                            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => (
-                              <label key={day} className="flex items-center">
-                                <input type="checkbox" defaultChecked={index < 5} className="h-4 w-4 text-blue-600 rounded" />
-                                <span className="ml-1 text-xs text-gray-700">{day}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
+              )}
 
-                {/* Save Button */}
-                <div className="mt-6 flex justify-between">
-                  <Link href="/dashboard" className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Dashboard
-                  </Link>
-                  <button className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Settings
+              {/* Notifications Tab */}
+              {activeTab === 'notifications' && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-gray-900">Notification Preferences</h2>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900">Email Notifications</h3>
+                        <p className="text-sm text-gray-600">Receive updates about lead processing</p>
+                      </div>
+                      <input type="checkbox" className="h-4 w-4 text-blue-600 rounded" defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900">Call Completion Alerts</h3>
+                        <p className="text-sm text-gray-600">Get notified when AI calls are completed</p>
+                      </div>
+                      <input type="checkbox" className="h-4 w-4 text-blue-600 rounded" defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900">Weekly Reports</h3>
+                        <p className="text-sm text-gray-600">Receive weekly summary of lead activity</p>
+                      </div>
+                      <input type="checkbox" className="h-4 w-4 text-blue-600 rounded" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Security Tab */}
+              {activeTab === 'security' && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-gray-900">Security Settings</h2>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="font-medium text-gray-900 mb-3">Change Password</h3>
+                      <div className="space-y-4">
+                        <input
+                          type="password"
+                          placeholder="Current Password"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <input
+                          type="password"
+                          placeholder="New Password"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <input
+                          type="password"
+                          placeholder="Confirm New Password"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900">Two-Factor Authentication</h3>
+                        <p className="text-sm text-gray-600">Add an extra layer of security</p>
+                      </div>
+                      <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Enable
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Data & Export Tab */}
+              {activeTab === 'data' && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-gray-900">Data Management</h2>
+                  
+                  <div className="space-y-6">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-medium text-gray-900 mb-2">Export Your Data</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Download all your leads and call data in CSV format
+                      </p>
+                      <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        Download CSV Export
+                      </button>
+                    </div>
+                    
+                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                      <h3 className="font-medium text-red-900 mb-2">Delete Account</h3>
+                      <p className="text-sm text-red-700 mb-4">
+                        Permanently delete your account and all associated data
+                      </p>
+                      <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        Delete Account
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Save Button */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  {saved && (
+                    <div className="flex items-center text-green-600">
+                      <Save className="h-5 w-5 mr-2" />
+                      <span className="text-sm">Settings saved successfully!</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleSave}
+                    className="ml-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Changes
                   </button>
                 </div>
               </div>
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </div>
