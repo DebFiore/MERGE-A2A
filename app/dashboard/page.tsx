@@ -51,18 +51,18 @@ export default function DashboardPage() {
                   <BarChart3 className="text-blue-500 mr-3 h-5 w-5" />
                   Overview
                 </a>
-                <a href="#" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
+               <Link href="/dashboard/upload" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4"></Link>
                   <Upload className="text-gray-400 mr-3 h-5 w-5" />
                   Upload Leads
-                </a>
+                </Link>
                 <a href="#" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
                   <Users className="text-gray-400 mr-3 h-5 w-5" />
                   Campaigns
                 </a>
-                <a href="#" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
+              <Link href="/dashboard/settings" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
                   <Settings className="text-gray-400 mr-3 h-5 w-5" />
                   Settings
-                </a>
+                </Link>
               </nav>
             </div>
           </div>
