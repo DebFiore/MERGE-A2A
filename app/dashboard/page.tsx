@@ -18,7 +18,7 @@ export default function DashboardPage() {
     { name: 'Lisa Davis', email: 'lisa@example.com', status: 'Calling', date: '15 min ago' },
   ]
 
- return (
+  return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
@@ -30,7 +30,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">Welcome back, User!</span>
-            <Link href="/login" className="text-gray-400 hover:text-gray-500">
+              <Link href="/login" className="text-gray-400 hover:text-gray-500">
                 <LogOut className="h-5 w-5" />
               </Link>
             </div>
@@ -51,7 +51,7 @@ export default function DashboardPage() {
                   <BarChart3 className="text-blue-500 mr-3 h-5 w-5" />
                   Overview
                 </a>
-               <Link href="/dashboard/upload" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4"></Link>
+                <Link href="/dashboard/upload" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
                   <Upload className="text-gray-400 mr-3 h-5 w-5" />
                   Upload Leads
                 </Link>
@@ -59,7 +59,7 @@ export default function DashboardPage() {
                   <Users className="text-gray-400 mr-3 h-5 w-5" />
                   Campaigns
                 </a>
-              <Link href="/dashboard/settings" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
+                <Link href="/dashboard/settings" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
                   <Settings className="text-gray-400 mr-3 h-5 w-5" />
                   Settings
                 </Link>
