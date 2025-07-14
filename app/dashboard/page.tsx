@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bot, Users, Phone, CheckCircle, Upload, BarChart3, Settings, LogOut, TrendingUp, Clock, AlertCircle, RefreshCw } from 'lucide-react'
+import { Bot, Users, Phone, CheckCircle, Upload, BarChart3, Settings, LogOut, TrendingUp, Clock, AlertCircle, RefreshCw, Zap } from 'lucide-react'
 
 interface DashboardStats {
   totalLeads: number
@@ -193,6 +193,10 @@ export default function DashboardPage() {
                 <Link href="/dashboard/upload" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
                   <Upload className="text-gray-400 mr-3 h-5 w-5" />
                   Upload Leads
+                </Link>
+                <Link href="/dashboard/leadhoop" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
+                  <Zap className="text-gray-400 mr-3 h-5 w-5" />
+                  LeadHoop
                 </Link>
                 <a href="#" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
                   <Users className="text-gray-400 mr-3 h-5 w-5" />

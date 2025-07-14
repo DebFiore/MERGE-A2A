@@ -64,6 +64,7 @@ model Client {
   voiceAgents VoiceAgent[]
   phoneNumbers PhoneNumber[]
   billingAccount BillingAccount?
+  leadHoopConfigs LeadHoopConfig[]
   
   @@map("clients")
 }
@@ -237,9 +238,114 @@ model Lead {
   callLogs      CallLog[]
   calls         Call[]
   activities    Activity[]
+  automationLogs AutomationLog[]
+  automationQueue AutomationQueue?
   
   @@unique([phone, campaignId])
   @@map("leads")
+}
+
+// ==========================================
+// LEADHOOP INTEGRATION MODELS
+// ==========================================
+
+model LeadHoopConfig {
+  id                    String   @id @default(cuid())
+  
+  // Client-specific configuration
+  clientId              String
+  client                Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // LeadHoop Portal Configuration
+  portalUrl             String
+  portalId              String
+  isActive              Boolean  @default(true)
+  
+  // Field Mapping Configuration (JSON as string for SQLite)
+  fieldMappingJson      String   @default("{}")  // Maps our fields to LeadHoop fields
+  
+  // Automation Settings
+  autoSubmit            Boolean  @default(true)
+  retryAttempts         Int      @default(3)
+  retryDelayMinutes     Int      @default(5)
+  
+  // Default Values (JSON as string for SQLite)
+  defaultValuesJson     String   @default("{}")  // Default values for portal fields
+  
+  // Timestamps
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  // Relations
+  automationLogs        AutomationLog[]
+  
+  @@unique([clientId, portalId])
+  @@map("leadhoop_configs")
+}
+
+model AutomationLog {
+  id                    String            @id @default(cuid())
+  
+  // Lead Information
+  leadId                String
+  lead                  Lead              @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  // LeadHoop Configuration
+  leadHoopConfigId      String
+  leadHoopConfig        LeadHoopConfig    @relation(fields: [leadHoopConfigId], references: [id], onDelete: Cascade)
+  
+  // Processing Details
+  status                String            // QUEUED, IN_PROGRESS, SUCCESS, FAILED, RETRY
+  attemptNumber         Int               @default(1)
+  
+  // URLs and Data
+  constructedUrl        String?           // The pre-filled URL
+  submissionDataJson    String?           // Data sent to portal (JSON as string)
+  
+  // Results
+  success               Boolean           @default(false)
+  responseDataJson      String?           // Response from portal (JSON as string)
+  errorMessage          String?
+  screenshotPath        String?           // Path to screenshot for debugging
+  
+  // Performance Metrics
+  processingTimeMs      Int?              // Time taken to process
+  queuedAt              DateTime          @default(now())
+  startedAt             DateTime?
+  completedAt           DateTime?
+  
+  // Portal Response
+  portalResponseCode    Int?
+  portalResponseMessage String?
+  
+  @@map("automation_logs")
+}
+
+model AutomationQueue {
+  id                    String            @id @default(cuid())
+  
+  // Lead Information
+  leadId                String            @unique
+  lead                  Lead              @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  // Queue Management
+  status                String            @default("QUEUED")  // QUEUED, PROCESSING, COMPLETED, FAILED
+  priority              Int               @default(1)         // 1=High, 2=Medium, 3=Low
+  
+  // Retry Logic
+  attemptCount          Int               @default(0)
+  maxAttempts           Int               @default(3)
+  nextAttemptAt         DateTime?
+  
+  // Processing Details
+  processingStartedAt   DateTime?
+  lastError             String?
+  
+  // Timestamps
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  
+  @@map("automation_queue")
 }
 
 // ==========================================

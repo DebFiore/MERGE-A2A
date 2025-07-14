@@ -25,7 +25,42 @@ export interface AuthUser {
 export async function getCurrentUser(): Promise<AuthUser | null> {
   try {
     const cookieStore = cookies()
-    const userEmail = cookieStore.get('userEmail')?.value
+    
+    // Try to get session from secure cookie first
+    const sessionCookie = cookieStore.get('merge-session')
+    if (sessionCookie) {
+      try {
+        const sessionData = JSON.parse(sessionCookie.value)
+        const user = await prisma.user.findUnique({
+          where: { id: sessionData.userId },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            role: true,
+            status: true,
+            emailVerified: true,
+            clientId: true,
+            client: {
+              select: {
+                id: true,
+                name: true,
+                subdomain: true,
+                planType: true,
+                isActive: true,
+              }
+            }
+          }
+        })
+        return user as AuthUser | null
+      } catch (e) {
+        // Fall through to legacy cookie check
+      }
+    }
+    
+    // Legacy cookie support
+    const userEmail = cookieStore.get('userEmail')?.value || cookieStore.get('merge-user-email')?.value
 
     if (!userEmail) {
       return null
