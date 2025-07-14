@@ -1,6 +1,6 @@
 // app/api/vapi/webhook/route.ts - Handle VAPI Webhooks
 import { NextRequest, NextResponse } from 'next/server'
-import { MultiTenantVAPIService } from '../../../lib/vapi-multitenant'
+import { MultiTenantVAPIService } from '../vapi-service'
 import { MultiTenantVAPIService } from '@/lib/vapi-multitenant'
 
 const prisma = new PrismaClient()
