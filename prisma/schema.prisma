@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,55 +7,140 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-enum ClientStatus {
-  ACTIVE
-  SUSPENDED
-  TRIAL
-  CANCELLED
-}
-
-enum UserRole {
-  ADMIN
-  OWNER
-  USER
-  VIEWER
-}
-
-enum CampaignStatus {
-  DRAFT
-  ACTIVE
-  PAUSED
-  COMPLETED
-  ARCHIVED
-}
-
-enum LeadStatus {
-  PENDING
-  CALLING
-  CONFIRMED
-  CALL_FAILED
-  NOT_INTERESTED
-  NO_CONTACT
-  ENTRY_IN_PROGRESS
-  ENTERED
-  ENTRY_FAILED
-  COMPLETE
-}
-
-enum TransactionType {
-  CREDIT
-  DEBIT
-  REFUND
-  ADJUSTMENT
-}
-
 model Client {
   id          String   @id @default(cuid())
   name        String
   email       String   @unique
   company     String?
   
-  // VAPI Configuration (per client)
   vapiApiKey        String?
   vapiPhoneNumberId String?
- vapiAssistantId   String?
+  vapiAssistantId   String?
+  vapiWebhookSecret String?
+  
+  isActive    Boolean  @default(true)
+  planType    String   @default("basic")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  users       User[]
+  campaigns   Campaign[]
+  leads       Lead[]
+  
+  @@map("clients")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  campaigns Campaign[]
+  leads     Lead[]
+  
+  @@map("users")
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String   @default("ACTIVE")
+  
+  vapiAssistantId   String?
+  customInstructions String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  leads       Lead[]
+  
+  @@map("campaigns")
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  company     String?
+  state       String?
+  city        String?
+  zipCode     String?
+  areaOfStudy String?
+  
+  status      String     @default("PENDING")
+  
+  callAttempts  Int      @default(0)
+  lastCallAt    DateTime?
+  callNotes     String?
+  tcpaConsent   Boolean  @default(false)
+  consentRecordingUrl String?
+  
+  formSubmitted Boolean  @default(false)
+  submissionUrl String?
+  submissionAt  DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  statusUpdates StatusUpdate[]
+  callLogs      CallLog[]
+  
+  @@map("leads")
+}
+
+model StatusUpdate {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  fromStatus String
+  toStatus   String
+  reason     String?
+  notes      String?
+  createdAt  DateTime @default(now())
+  
+  @@map("status_updates")
+}
+
+model CallLog {
+  id          String   @id @default(cuid())
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  callId      String?
+  duration    Int?
+  status      String
+  recording   String?
+  transcript  String?
+  notes       String?
+  cost        Float?
+  
+  startedAt   DateTime
+  endedAt     DateTime?
+  createdAt   DateTime @default(now())
+  
+  @@map("call_logs")
+}
+
