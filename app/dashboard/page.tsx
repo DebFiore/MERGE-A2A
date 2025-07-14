@@ -30,7 +30,7 @@ export default function DashboardPage() {
               <span className="ml-2 text-xl font-bold text-gray-900">MERGE AI</span>
             </div>
             <div className="flex items-center space-x-4">
-             <span className="text-sm text-gray-700">Welcome back, {firstName}!</span>
+           <span className="text-sm text-gray-700">Welcome back!</span>
               <Link href="/login" className="text-gray-400 hover:text-gray-500">
                 <LogOut className="h-5 w-5" />
               </Link>
