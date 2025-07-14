@@ -61,4 +61,4 @@ model Client {
   // VAPI Configuration (per client)
   vapiApiKey        String?
   vapiPhoneNumberId String?
-  vapiAssis
+ vapiAssistantId   String?
