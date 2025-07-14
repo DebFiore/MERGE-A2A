@@ -10,153 +10,102 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+// NEW ENUMS (added for enhanced type safety)
+enum ClientStatus {
+  ACTIVE
+  SUSPENDED
+  TRIAL
+  CANCELLED
+}
+
+enum UserRole {
+  ADMIN      // Platform admin
+  OWNER      // Client owner
+  USER       // Regular client user
+  VIEWER     // Read-only access
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum LeadStatus {
+  PENDING
+  CALLING
+  CONFIRMED
+  CALL_FAILED
+  NOT_INTERESTED
+  NO_CONTACT
+  ENTRY_IN_PROGRESS
+  ENTERED
+  ENTRY_FAILED
+  COMPLETE
+}
+
+enum TransactionType {
+  CREDIT      // Money added to account
+  DEBIT       // Money spent (calls, etc)
+  REFUND      // Refunded amount
+  ADJUSTMENT  // Manual adjustment
+}
+
+// YOUR ORIGINAL CLIENT MODEL (enhanced with new fields)
 model Client {
   id          String   @id @default(cuid())
   name        String
   email       String   @unique
   company     String?
   
-  // VAPI Configuration (per client)
+  // VAPI Configuration (per client) - YOUR ORIGINAL DESIGN
   vapiApiKey        String?
   vapiPhoneNumberId String?
   vapiAssistantId   String?
   vapiWebhookSecret String?
   
-  // Billing & Status
+  // Billing & Status - YOUR ORIGINAL + ENHANCEMENTS
   isActive    Boolean  @default(true)
   planType    String   @default("basic")
+  
+  // NEW ENHANCEMENTS (added to your original)
+  subdomain         String?      @unique // For subdomain routing
+  status            ClientStatus @default(ACTIVE)
+  monthlyLimit      Int          @default(1000) // Lead processing limit
+  subscriptionTier  String       @default("starter")
+  billingEmail      String?      // Can default to main email
+  timezone          String       @default("America/New_York")
+  settings          Json?        // Flexible settings storage
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  // Relations
+  // Relations - YOUR ORIGINAL + NEW ADDITIONS
   users       User[]
   campaigns   Campaign[]
   leads       Lead[]
   
+  // NEW RELATIONS (added to support enhanced functionality)
+  phoneNumbers PhoneNumber[]
+  voiceAgents  VoiceAgent[]
+  billing      BillingAccount?
+  
   @@map("clients")
 }
 
+// YOUR ORIGINAL USER MODEL (enhanced with authentication)
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   firstName String
   lastName  String
-  role      String   @default("USER") // ADMIN, USER, VIEWER
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      UserRole @default(USER) // Enhanced from String to enum
   
-  // Foreign Keys
-  clientId  String
-  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  // NEW ENHANCEMENTS (added for authentication)
+  password    String?   // For authentication
+  lastLoginAt DateTime?
+  isActive    Boolean   @default(true)
   
-  // Relations
-  campaigns Campaign[]
-  leads     Lead[]
-  
-  @@map("users")
-}
-
-model Campaign {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  status      String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED, ARCHIVED
-  
-  // Campaign-specific VAPI settings (can override client defaults)
-  vapiAssistantId   String?
-  customInstructions String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Foreign Keys
-  clientId    String
-  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Relations
-  leads       Lead[]
-  
-  @@map("campaigns")
-}
-
-model Lead {
-  id          String     @id @default(cuid())
-  firstName   String
-  lastName    String
-  email       String
-  phone       String?
-  company     String?
-  state       String?
-  city        String?
-  zipCode     String?
-  areaOfStudy String?
-  
-  // Status tracking - PENDING, CALLING, CONFIRMED, CALL_FAILED, NOT_INTERESTED, NO_CONTACT, ENTRY_IN_PROGRESS, ENTERED, ENTRY_FAILED
-  status      String     @default("PENDING")
-  
-  // Call tracking
-  callAttempts  Int      @default(0)
-  lastCallAt    DateTime?
-  callNotes     String?
-  tcpaConsent   Boolean  @default(false)
-  consentRecordingUrl String?
-  
-  // Form submission tracking
-  formSubmitted Boolean  @default(false)
-  submissionUrl String?
-  submissionAt  DateTime?
-  
-  // Timestamps
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Foreign Keys
-  clientId    String
-  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  campaignId  String
-  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  
-  // Relations
-  statusUpdates StatusUpdate[]
-  callLogs      CallLog[]
-  
-  @@map("leads")
-}
-
-model StatusUpdate {
-  id        String   @id @default(cuid())
-  leadId    String
-  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  
-  fromStatus String
-  toStatus   String
-  reason     String?
-  notes      String?
-  createdAt  DateTime @default(now())
-  
-  @@map("status_updates")
-}
-
-model CallLog {
-  id          String   @id @default(cuid())
-  leadId      String
-  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  
-  callId      String?
-  duration    Int?
-  status      String   // INITIATED, RINGING, ANSWERED, COMPLETED, FAILED, NO_ANSWER, BUSY, VOICEMAIL
-  recording   String?
-  transcript  String?
-  notes       String?
-  cost        Float?
-  
-  startedAt   DateTime
-  endedAt     DateTime?
-  createdAt   DateTime @default(now())
-  
-  @@map("call_logs")
-}
+  createdAt DateTime
