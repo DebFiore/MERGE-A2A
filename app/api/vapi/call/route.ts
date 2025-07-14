@@ -1,6 +1,6 @@
 // app/api/vapi/call/route.ts - Multi-tenant VAPI Call Initiation
 import { NextRequest, NextResponse } from 'next/server'
-import { MultiTenantVAPIService } from '../vapi-service'
+import { MultiTenantVAPIService } from '../vapi-service.js'
 
 // POST - Initiate a VAPI call for a lead
 export async function POST(request: NextRequest) {
