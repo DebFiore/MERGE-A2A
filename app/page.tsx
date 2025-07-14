@@ -17,7 +17,7 @@ export default function HomePage() {
               <Link href="/login" className="text-gray-600 hover:text-gray-900 px-4 py-2">
                 Sign In
               </Link>
-              <Link href="/dashboard" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+              <Link href="/register" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                 Get Started
               </Link>
             </div>
@@ -40,7 +40,7 @@ export default function HomePage() {
                   From voice confirmation to form submission - completely automated.
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
-                  <Link href="/dashboard" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex items-center">
+                  <Link href="/register" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex items-center">
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

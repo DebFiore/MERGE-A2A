@@ -1,18 +1,18 @@
-// Enhanced Prisma Schema for MERGE AI - SQLite Compatible
+// Production Prisma Schema for MERGE AI - PostgreSQL
 // Multi-Tenant AI Voice Calling SaaS Platform
-// Built on your existing schema with SQLite-compatible enhancements
+// Optimized for Vercel + PostgreSQL deployment
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ==========================================
-// ENHANCED CORE MODELS
+// CORE MODELS - Production Ready
 // ==========================================
 
 model Client {
@@ -21,8 +21,8 @@ model Client {
   email       String   @unique
   company     String?
   
-  // NEW: Enhanced Client Fields
-  subdomain   String?  @unique  // For multi-tenant subdomains
+  // Enhanced Client Fields
+  subdomain   String?  @unique
   logo        String?
   website     String?
   industry    String?
@@ -36,7 +36,7 @@ model Client {
   country        String?
   postalCode     String?
   
-  // VAPI Configuration (existing)
+  // VAPI Configuration
   vapiApiKey        String?
   vapiPhoneNumberId String?
   vapiAssistantId   String?
@@ -44,15 +44,18 @@ model Client {
   
   // Enhanced Settings
   isActive    Boolean   @default(true)
-  planType    String    @default("BASIC")  // TRIAL, BASIC, PROFESSIONAL, ENTERPRISE, CUSTOM
-  settingsJson String   @default("{}")     // JSON as string for SQLite
-  customBrandingJson String?              // JSON as string for SQLite
+  planType    String    @default("BASIC")
+  settings    Json      @default("{}")
+  customBranding Json?
   
-  // Billing & Limits
-  monthlyCallLimit  Int     @default(1000)
-  callsUsed        Int     @default(0)
-  minutesLimit     Int     @default(10000)
-  minutesUsed      Int     @default(0)
+  // Billing & Usage
+  billingEmail      String?
+  paymentMethodId   String?
+  subscriptionId    String?
+  trialEndsAt       DateTime?
+  callsThisMonth    Int       @default(0)
+  monthlyCallLimit  Int       @default(1000)
+  minutesUsed       Int       @default(0)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -74,27 +77,24 @@ model User {
   firstName String
   lastName  String
   
-  // NEW: Enhanced User Fields
+  // Authentication
+  hashedPassword String?
+  emailVerified  Boolean   @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
+  
+  // Enhanced User Fields
+  role      String    @default("CLIENT_USER")
+  status    String    @default("PENDING")
   phone     String?
   avatar    String?
-  password  String?   // For authentication
+  title     String?
+  lastLoginAt DateTime?
   
-  // Role & Status (as strings for SQLite compatibility)
-  role      String    @default("CLIENT_USER")    // SUPER_ADMIN, CLIENT_ADMIN, CLIENT_USER, CLIENT_VIEWER
-  status    String    @default("PENDING_VERIFICATION")  // ACTIVE, INACTIVE, SUSPENDED, PENDING_VERIFICATION
-  
-  // Email Verification
-  emailVerified     Boolean   @default(false)
-  emailVerifyToken  String?
-  emailVerifyExpiry DateTime?
-  
-  // Password Reset
-  resetToken        String?
-  resetExpiry       DateTime?
-  
-  // Settings & Activity
-  preferencesJson   String    @default("{}")  // JSON as string for SQLite
-  lastLoginAt       DateTime?
+  // Preferences
+  timezone     String?
+  language     String    @default("en")
+  preferences  Json      @default("{}")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -116,37 +116,29 @@ model Campaign {
   name        String
   description String?
   
-  // Enhanced Campaign Fields (as strings for SQLite)
-  type        String         @default("OUTBOUND_SALES")  // OUTBOUND_SALES, INBOUND_SUPPORT, APPOINTMENT_SETTING, SURVEY, FOLLOW_UP, CUSTOM
-  status      String         @default("DRAFT")           // DRAFT, SCHEDULED, ACTIVE, PAUSED, COMPLETED, ARCHIVED
+  // Enhanced Campaign Fields
+  type        String         @default("OUTBOUND_SALES")
+  status      String         @default("DRAFT")
+  priority    String         @default("MEDIUM")
   
-  // Scheduling
-  startDate         DateTime?
-  endDate           DateTime?
-  dailyStartTime    String?   // Format: "09:00"
-  dailyEndTime      String?   // Format: "17:00"
-  timezone          String    @default("UTC")
-  workingDaysJson   String    @default("[1,2,3,4,5]")  // JSON as string for SQLite
+  // Schedule & Timing
+  startDate   DateTime?
+  endDate     DateTime?
+  timezone    String         @default("UTC")
+  callHours   Json          @default("{\"start\": \"09:00\", \"end\": \"17:00\", \"days\": [1,2,3,4,5]}")
   
-  // Configuration
-  maxCallsPerDay    Int?
-  maxAttemptsPerLead Int      @default(3)
-  timeBetweenCalls  Int       @default(120) // minutes
+  // Call Configuration
+  maxAttempts        Int      @default(3)
+  attemptDelay       Int      @default(24)
+  callScript         String?
+  voiceInstructions  String?
   
-  // VAPI Configuration (existing)
-  vapiAssistantId   String?
-  customInstructions String?  // Removed @db.Text for SQLite
-  
-  // Enhanced Script & Prompts
-  scriptTemplate    String?   // Removed @db.Text for SQLite
-  voicePrompt       String?   // Removed @db.Text for SQLite
-  customFieldsJson  String?   // JSON as string for SQLite
-  
-  // Performance Metrics
-  totalLeads        Int       @default(0)
-  completedCalls    Int       @default(0)
-  successfulCalls   Int       @default(0)
-  averageCallDuration Float?
+  // Performance Tracking
+  totalLeads      Int       @default(0)
+  completedCalls  Int       @default(0)
+  successfulCalls Int       @default(0)
+  conversionRate  Float?
+  avgCallDuration Float?
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -158,7 +150,7 @@ model Campaign {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // NEW: Enhanced Relations
+  // Enhanced Relations
   voiceAgentId      String?
   voiceAgent        VoiceAgent? @relation(fields: [voiceAgentId], references: [id])
   
@@ -192,20 +184,20 @@ model Lead {
   alternatePhone String?
   areaOfStudy   String?
   
-  // Status (as string for SQLite)
-  status      String     @default("NEW")  // NEW, PENDING, QUEUED, IN_PROGRESS, CONTACTED, INTERESTED, NOT_INTERESTED, CALLBACK_SCHEDULED, CONVERTED, FAILED, DO_NOT_CALL
+  // Status
+  status      String     @default("NEW")
   
   // Enhanced Tracking
   source            String?
   score             Int?
-  tagsJson          String    @default("[]")    // JSON as string for SQLite
-  customDataJson    String?                     // JSON as string for SQLite
+  tags              String[]  @default([])
+  customData        Json?
   
-  // Call Tracking (enhanced)
+  // Call Tracking
   callAttempts     Int       @default(0)
   lastCallAt       DateTime?
   nextAttemptAt    DateTime?
-  callNotes        String?   // Removed @db.Text for SQLite
+  callNotes        String?
   
   // Compliance
   tcpaConsent         Boolean   @default(false)
@@ -213,12 +205,7 @@ model Lead {
   
   // Form Submission
   formSubmitted Boolean   @default(false)
-  submissionUrl String?
-  submissionAt  DateTime?
-  
-  // Enhanced Notes
-  notes           String?   // Removed @db.Text for SQLite
-  internalNotes   String?   // Removed @db.Text for SQLite
+  optedOut      Boolean   @default(false)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -242,36 +229,26 @@ model Lead {
   @@map("leads")
 }
 
-// ==========================================
-// NEW MODELS FOR ENHANCED FUNCTIONALITY
-// ==========================================
+// Additional models would follow the same pattern...
+// (VoiceAgent, PhoneNumber, Call, Activity, BillingAccount, etc.)
 
 model VoiceAgent {
   id                String      @id @default(cuid())
   name              String
-  description       String?
+  voice             String      @default("FEMALE_US")
+  personality       String      @default("professional")
+  greeting          String?
+  instructions      String?
   
-  // Voice Configuration
-  voice             String      @default("FEMALE_US")  // MALE_US, FEMALE_US, MALE_UK, FEMALE_UK, MALE_AU, FEMALE_AU, CUSTOM
-  language          String      @default("en-US")
-  pitch             Float       @default(1.0)
-  speed             Float       @default(1.0)
-  
-  // AI Configuration
-  personality       String?     // Removed @db.Text for SQLite
-  instructions      String?     // Removed @db.Text for SQLite
-  model             String      @default("gpt-3.5-turbo")
-  temperature       Float       @default(0.7)
-  
-  // VAPI Integration
-  vapiAgentId       String?     @unique
-  vapiConfigJson    String?     // JSON as string for SQLite
-  
-  // Status
+  // Configuration
   isActive          Boolean     @default(true)
   isDefault         Boolean     @default(false)
+  settings          Json        @default("{}")
   
-  // Timestamps
+  // VAPI Integration
+  vapiAssistantId   String?     @unique
+  vapiConfiguration Json?
+  
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
   
@@ -292,22 +269,18 @@ model PhoneNumber {
   friendlyName      String?
   
   // Configuration
-  type              String              @default("LOCAL")  // LOCAL, TOLL_FREE, INTERNATIONAL
-  status            String              @default("PENDING_VERIFICATION")  // ACTIVE, INACTIVE, PENDING_VERIFICATION, RELEASED
-  capabilitiesJson  String              @default("{\"voice\": true, \"sms\": false}")  // JSON as string for SQLite
+  type              String              @default("LOCAL")
+  status            String              @default("PENDING_VERIFICATION")
+  capabilities      Json                @default("{\"voice\": true, \"sms\": false}")
   
-  // Provider Information
-  provider          String              @default("VAPI")
-  providerNumberId  String?             @unique
-  monthlyFee        Float?
-  perMinuteRate     Float?
+  // Billing
+  monthlyCost       Float               @default(15.00)
+  setupCost         Float               @default(0.00)
   
-  // Location
-  country           String              @default("US")
-  region            String?
-  city              String?
+  // Provider Integration
+  providerId        String?
+  providerData      Json?
   
-  // Timestamps
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   releasedAt        DateTime?
@@ -329,29 +302,26 @@ model Call {
   // Call Details
   fromNumber        String
   toNumber          String
-  direction         String          @default("outbound") // outbound/inbound
+  direction         String          @default("outbound")
   status            String
-  outcome           String?         // ANSWERED, NO_ANSWER, BUSY, VOICEMAIL, FAILED, INVALID_NUMBER, DISCONNECTED
+  outcome           String?
+  duration          Int?
+  cost              Float?
   
-  // Timing
+  // Timestamps
   startedAt         DateTime        @default(now())
   answeredAt        DateTime?
   endedAt           DateTime?
-  duration          Int?            // seconds
   
-  // Recording & Transcript
+  // Recording & Transcription
   recordingUrl      String?
-  transcriptUrl     String?
-  transcript        String?         // Removed @db.Text for SQLite
-  summary           String?         // Removed @db.Text for SQLite
+  transcription     String?
+  summary           String?
   sentiment         String?
-  
-  // Cost
-  cost              Float?
   
   // VAPI Integration
   vapiCallId        String?         @unique
-  vapiDataJson      String?         // JSON as string for SQLite
+  vapiData          Json?
   
   // Relations
   leadId            String
@@ -371,9 +341,11 @@ model Call {
 
 model Activity {
   id                String      @id @default(cuid())
-  type              String      // call_scheduled, call_completed, lead_converted, etc.
+  
+  // Activity Details
+  type              String
   description       String
-  metadataJson      String?     // JSON as string for SQLite
+  metadata          Json?
   
   // Timestamps
   createdAt         DateTime    @default(now())
@@ -392,31 +364,25 @@ model BillingAccount {
   id                String              @id @default(cuid())
   
   // Billing Details
-  plan              String              @default("TRIAL")  // TRIAL, BASIC, PROFESSIONAL, ENTERPRISE, CUSTOM
+  plan              String              @default("TRIAL")
   status            String              @default("active")
   
-  // Subscription
-  subscriptionId    String?             @unique
-  subscriptionStart DateTime?
-  subscriptionEnd   DateTime?
-  trialEndsAt       DateTime?
-  
-  // Limits & Usage (duplicated in Client for performance)
-  monthlyCallLimit  Int                 @default(1000)
+  // Usage Tracking
   callsUsed         Int                 @default(0)
-  minutesLimit      Int                 @default(10000)
+  monthlyCallLimit  Int                 @default(1000)
   minutesUsed       Int                 @default(0)
+  monthlyMinuteLimit Int                @default(5000)
+  
+  // Billing Cycle
+  billingCycleStart DateTime            @default(now())
+  billingCycleEnd   DateTime?
+  nextBillingDate   DateTime?
   
   // Payment
-  stripeCustomerId  String?             @unique
-  paymentMethodId   String?
+  stripeCustomerId      String?         @unique
+  stripeSubscriptionId  String?         @unique
+  paymentMethodId       String?
   
-  // Billing Contact
-  billingEmail      String?
-  billingName       String?
-  billingAddressJson String?            // JSON as string for SQLite
-  
-  // Timestamps
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   
@@ -433,21 +399,16 @@ model BillingTransaction {
   id                String              @id @default(cuid())
   
   // Transaction Details
-  type              String              // SUBSCRIPTION, USAGE, CREDIT, REFUND, ADJUSTMENT
-  status            String              @default("PENDING")  // PENDING, COMPLETED, FAILED, REFUNDED
+  type              String
+  status            String              @default("PENDING")
   amount            Float
   currency          String              @default("USD")
   description       String
   
-  // Payment Details
-  stripeInvoiceId   String?             @unique
-  stripeChargeId    String?             @unique
-  paymentMethod     String?
+  // Provider Integration
+  stripePaymentIntentId String?         @unique
+  stripeInvoiceId       String?
   
-  // Metadata
-  metadataJson      String?             // JSON as string for SQLite
-  
-  // Timestamps
   createdAt         DateTime            @default(now())
   processedAt       DateTime?
   
@@ -458,40 +419,26 @@ model BillingTransaction {
   @@map("billing_transactions")
 }
 
-// ==========================================
-// EXISTING MODELS (Enhanced)
-// ==========================================
-
+// Legacy models for compatibility
 model StatusUpdate {
   id        String   @id @default(cuid())
   leadId    String
   lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  
-  fromStatus String
-  toStatus   String
-  reason     String?
-  notes      String?
-  createdAt  DateTime @default(now())
+  status    String
+  createdAt DateTime @default(now())
   
   @@map("status_updates")
 }
 
 model CallLog {
-  id          String   @id @default(cuid())
-  leadId      String
-  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  
-  callId      String?
-  duration    Int?
-  status      String
-  recording   String?
-  transcript  String?
-  notes       String?
-  cost        Float?
-  
-  startedAt   DateTime
-  endedAt     DateTime?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  leadId     String
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  status     String
+  notes      String?
+  duration   Int?
+  recordingUrl String?
+  createdAt  DateTime @default(now())
   
   @@map("call_logs")
 }
