@@ -41,7 +41,7 @@ model User {
   email     String   @unique
   firstName String
   lastName  String
-  role      UserRole @default(USER)
+  role      String   @default("USER") // ADMIN, USER, VIEWER
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -60,7 +60,7 @@ model Campaign {
   id          String   @id @default(cuid())
   name        String
   description String?
-  status      CampaignStatus @default(ACTIVE)
+  status      String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED, ARCHIVED
   
   // Campaign-specific VAPI settings (can override client defaults)
   vapiAssistantId   String?
@@ -93,8 +93,8 @@ model Lead {
   zipCode     String?
   areaOfStudy String?
   
-  // Status tracking
-  status      LeadStatus @default(PENDING)
+  // Status tracking - PENDING, CALLING, CONFIRMED, CALL_FAILED, NOT_INTERESTED, NO_CONTACT, ENTRY_IN_PROGRESS, ENTERED, ENTRY_FAILED
+  status      String     @default("PENDING")
   
   // Call tracking
   callAttempts  Int      @default(0)
@@ -132,8 +132,8 @@ model StatusUpdate {
   leadId    String
   lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   
-  fromStatus LeadStatus
-  toStatus   LeadStatus
+  fromStatus String
+  toStatus   String
   reason     String?
   notes      String?
   createdAt  DateTime @default(now())
@@ -148,7 +148,7 @@ model CallLog {
   
   callId      String?
   duration    Int?
-  status      CallStatus
+  status      String   // INITIATED, RINGING, ANSWERED, COMPLETED, FAILED, NO_ANSWER, BUSY, VOICEMAIL
   recording   String?
   transcript  String?
   notes       String?
@@ -159,41 +159,4 @@ model CallLog {
   createdAt   DateTime @default(now())
   
   @@map("call_logs")
-}
-
-// Enums
-enum UserRole {
-  ADMIN
-  USER
-  VIEWER
-}
-
-enum CampaignStatus {
-  ACTIVE
-  PAUSED
-  COMPLETED
-  ARCHIVED
-}
-
-enum LeadStatus {
-  PENDING
-  CALLING
-  CONFIRMED
-  CALL_FAILED
-  NOT_INTERESTED
-  NO_CONTACT
-  ENTRY_IN_PROGRESS
-  ENTERED
-  ENTRY_FAILED
-}
-
-enum CallStatus {
-  INITIATED
-  RINGING
-  ANSWERED
-  COMPLETED
-  FAILED
-  NO_ANSWER
-  BUSY
-  VOICEMAIL
 }
