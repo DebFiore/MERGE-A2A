@@ -97,15 +97,27 @@ model Client {
 
 // YOUR ORIGINAL USER MODEL (enhanced with authentication)
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  firstName String
-  lastName  String
-  role      UserRole @default(USER) // Enhanced from String to enum
+  id          String    @id @default(cuid())
+  email       String    @unique
+  firstName   String
+  lastName    String
+  role        UserRole  @default(USER) // Enhanced from String to enum
   
   // NEW ENHANCEMENTS (added for authentication)
   password    String?   // For authentication
   lastLoginAt DateTime?
   isActive    Boolean   @default(true)
   
-  createdAt DateTime
+  createdAt   DateTime  @default(now())     // ← ADD @default(now())
+  updatedAt   DateTime  @updatedAt          // ← ADD @updatedAt
+  
+  // Foreign Keys
+  clientId  String
+  client    Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  campaigns Campaign[]
+  leads     Lead[]
+  
+  @@map("users")
+}
