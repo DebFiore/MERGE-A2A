@@ -10,7 +10,6 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-// NEW ENUMS (added for enhanced type safety)
 enum ClientStatus {
   ACTIVE
   SUSPENDED
@@ -19,10 +18,10 @@ enum ClientStatus {
 }
 
 enum UserRole {
-  ADMIN      // Platform admin
-  OWNER      // Client owner
-  USER       // Regular client user
-  VIEWER     // Read-only access
+  ADMIN
+  OWNER
+  USER
+  VIEWER
 }
 
 enum CampaignStatus {
@@ -47,77 +46,19 @@ enum LeadStatus {
 }
 
 enum TransactionType {
-  CREDIT      // Money added to account
-  DEBIT       // Money spent (calls, etc)
-  REFUND      // Refunded amount
-  ADJUSTMENT  // Manual adjustment
+  CREDIT
+  DEBIT
+  REFUND
+  ADJUSTMENT
 }
 
-// YOUR ORIGINAL CLIENT MODEL (enhanced with new fields)
 model Client {
   id          String   @id @default(cuid())
   name        String
   email       String   @unique
   company     String?
   
-  // VAPI Configuration (per client) - YOUR ORIGINAL DESIGN
+  // VAPI Configuration (per client)
   vapiApiKey        String?
   vapiPhoneNumberId String?
-  vapiAssistantId   String?
-  vapiWebhookSecret String?
-  
-  // Billing & Status - YOUR ORIGINAL + ENHANCEMENTS
-  isActive    Boolean  @default(true)
-  planType    String   @default("basic")
-  
-  // NEW ENHANCEMENTS (added to your original)
-  subdomain         String?      @unique // For subdomain routing
-  status            ClientStatus @default(ACTIVE)
-  monthlyLimit      Int          @default(1000) // Lead processing limit
-  subscriptionTier  String       @default("starter")
-  billingEmail      String?      // Can default to main email
-  timezone          String       @default("America/New_York")
-  settings          Json?        // Flexible settings storage
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations - YOUR ORIGINAL + NEW ADDITIONS
-  users       User[]
-  campaigns   Campaign[]
-  leads       Lead[]
-  
-  // NEW RELATIONS (added to support enhanced functionality)
-  phoneNumbers PhoneNumber[]
-  voiceAgents  VoiceAgent[]
-  billing      BillingAccount?
-  
-  @@map("clients")
-}
-
-// YOUR ORIGINAL USER MODEL (enhanced with authentication)
-model User {
-  id          String    @id @default(cuid())
-  email       String    @unique
-  firstName   String
-  lastName    String
-  role        UserRole  @default(USER) // Enhanced from String to enum
-  
-  // NEW ENHANCEMENTS (added for authentication)
-  password    String?   // For authentication
-  lastLoginAt DateTime?
-  isActive    Boolean   @default(true)
-  
-  createdAt   DateTime  @default(now())     // ← ADD @default(now())
-  updatedAt   DateTime  @updatedAt          // ← ADD @updatedAt
-  
-  // Foreign Keys
-  clientId  String
-  client    Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  
-  // Relations
-  campaigns Campaign[]
-  leads     Lead[]
-  
-  @@map("users")
-}
+  vapiAssis
