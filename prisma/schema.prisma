@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Client {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  company     String?
+  
+  // VAPI Configuration (per client)
+  vapiApiKey        String?
+  vapiPhoneNumberId String?
+  vapiAssistantId   String?
+  vapiWebhookSecret String?
+  
+  // Billing & Status
+  isActive    Boolean  @default(true)
+  planType    String   @default("basic")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  users       User[]
+  campaigns   Campaign[]
+  leads       Lead[]
+  
+  @@map("clients")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Foreign Keys
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  campaigns Campaign[]
+  leads     Lead[]
+  
+  @@map("users")
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      CampaignStatus @default(ACTIVE)
+  
+  // Campaign-specific VAPI settings (can override client defaults)
+  vapiAssistantId   String?  // Override client's default assistant
+  customInstructions String? // Campaign-specific voice instructions
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Foreign Keys
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  leads       Lead[]
+  
+  @@map("campaigns")
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  company     String?
+  state       String?
+  city        String?
+  zipCode     String?
+  areaOfStudy String?
+  
+  // Status tracking
+  status      LeadStatus @default(PENDING)
+  statusHistory Json?    // Store status change history
+  
+  // Call tracking
+  callAttempts  Int      @default(0)
+  lastCallAt    DateTime?
+  callNotes     String?
+  tcpaConsent   Boolean  @default(false)
+  consentRecordingUrl String?
+  
+  // Form submission tracking
+  formSubmitted Boolean  @default(false)
+  submissionUrl String?
+  submissionAt  DateTime?
+  submissionErrors Json?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Foreign Keys
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  statusUpdates StatusUpdate[]
+  callLogs      CallLog[]
+  
+  @@map("leads")
+}
+
+model StatusUpdate {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  fromStatus LeadStatus
+  toStatus   LeadStatus
+  reason     String?
+  notes      String?
+  createdAt  DateTime @default(now())
+  
+  @@map("status_updates")
+}
+
+model CallLog {
+  id          String   @id @default(cuid())
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  callId      String?  // External call service ID
+  duration    Int?     // Duration in seconds
+  status      CallStatus
+  recording   String?  // Recording URL
+  transcript  String?  // Call transcript
+  notes       String?
+  cost        Float?   // Call cost
+  
+  startedAt   DateTime
+  endedAt     DateTime?
+  createdAt   DateTime @default(now())
+  
+  @@map("call_logs")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  USER
+  VIEWER
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum LeadStatus {
+  PENDING
+  CALLING
+  CONFIRMED
+  CALL_FAILED
+  NOT_INTERESTED
+  NO_CONTACT
+  ENTRY_IN_PROGRESS
+  ENTERED
+  ENTRY_FAILED
+}
+
+enum CallStatus {
+  INITIATED
+  RINGING
+  ANSWERED
+  COMPLETED
+  FAILED
+  NO_ANSWER
+  BUSY
+  VOICEMAIL
+}
