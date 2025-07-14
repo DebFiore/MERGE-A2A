@@ -63,8 +63,8 @@ model Campaign {
   status      CampaignStatus @default(ACTIVE)
   
   // Campaign-specific VAPI settings (can override client defaults)
-  vapiAssistantId   String?  // Override client's default assistant
-  customInstructions String? // Campaign-specific voice instructions
+  vapiAssistantId   String?
+  customInstructions String?
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -95,7 +95,6 @@ model Lead {
   
   // Status tracking
   status      LeadStatus @default(PENDING)
-  statusHistory Json?    // Store status change history
   
   // Call tracking
   callAttempts  Int      @default(0)
@@ -108,7 +107,6 @@ model Lead {
   formSubmitted Boolean  @default(false)
   submissionUrl String?
   submissionAt  DateTime?
-  submissionErrors Json?
   
   // Timestamps
   createdAt   DateTime @default(now())
@@ -148,13 +146,13 @@ model CallLog {
   leadId      String
   lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   
-  callId      String?  // External call service ID
-  duration    Int?     // Duration in seconds
+  callId      String?
+  duration    Int?
   status      CallStatus
-  recording   String?  // Recording URL
-  transcript  String?  // Call transcript
+  recording   String?
+  transcript  String?
   notes       String?
-  cost        Float?   // Call cost
+  cost        Float?
   
   startedAt   DateTime
   endedAt     DateTime?
