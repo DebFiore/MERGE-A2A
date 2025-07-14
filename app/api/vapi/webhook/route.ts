@@ -1,6 +1,6 @@
 // app/api/vapi/webhook/route.ts - Handle VAPI Webhooks
 import { NextRequest, NextResponse } from 'next/server'
-import { MultiTenantVAPIService } from '../vapi-service.js''
+import { MultiTenantVAPIService } from '../vapi-service.js'
 
 export async function POST(request: NextRequest) {
   try {
