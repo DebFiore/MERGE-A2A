@@ -2,11 +2,14 @@
   "name": "merge-ai-platform",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-  "build": "npx prisma generate && next build",
-    "start": "next start",
-    "lint": "next lint"
+"scripts": {
+  "dev": "next dev",
+  "build": "prisma generate && next build",
+  "postinstall": "prisma generate",
+  "start": "next start",
+  "lint": "next lint"
+}
+}
   },
   "dependencies": {
     "next": "14.0.4",
