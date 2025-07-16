@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bot, Users, Phone, CheckCircle, Upload, BarChart3, Settings, LogOut, TrendingUp, Clock, AlertCircle, RefreshCw, Zap } from 'lucide-react'
+import { Bot, Users, Phone, CheckCircle, Upload, BarChart3, Settings, LogOut, TrendingUp, Clock, AlertCircle, RefreshCw, Zap, Edit, Eye } from 'lucide-react'
 
 interface DashboardStats {
   totalLeadsInSystem: number
@@ -349,11 +349,14 @@ export default function DashboardPage() {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                   <div className="flex space-x-2">
-                                    <button className="text-blue-600 hover:text-blue-900">
-                                      Call
+                                    <button className="text-blue-600 hover:text-blue-900 p-1">
+                                      <Phone className="h-4 w-4" />
                                     </button>
-                                    <button className="text-green-600 hover:text-green-900">
-                                      Edit
+                                    <button className="text-green-600 hover:text-green-900 p-1">
+                                      <Eye className="h-4 w-4" />
+                                    </button>
+                                    <button className="text-gray-600 hover:text-gray-900 p-1">
+                                      <Edit className="h-4 w-4" />
                                     </button>
                                   </div>
                                 </td>
