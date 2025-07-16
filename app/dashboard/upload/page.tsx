@@ -11,6 +11,32 @@ interface ParsedLead {
   phone?: string
   company?: string
   status: string
+  firstName?: string
+  lastName?: string
+  address?: string
+  address2?: string
+  city?: string
+  state?: string
+  zipCode?: string
+  gender?: string
+  dateOfBirth?: string
+  ipAddress?: string
+  subId2?: string
+  signupUrl?: string
+  consentUrl?: string
+  educationLevel?: string
+  graduationYear?: string
+  startDate?: string
+  militaryType?: string
+  campusType?: string
+  areaStudyIds?: string
+  levelOfInterest?: string
+  internetPc?: string
+  usCitizen?: string
+  rnLicense?: string
+  teachingLicense?: string
+  enrolledStatus?: string
+  testField?: string
   [key: string]: any
 }
 
@@ -41,19 +67,28 @@ export default function UploadPage() {
     const errors: ValidationError[] = []
     
     data.forEach((row, index) => {
-      // Skip empty rows
-      if (!row.name && !row.email) return
+      // Skip empty rows - check for LeadHoop fields
+      if (!row.FIRSTNAME && !row.EMAIL && !row.name && !row.email) return
       
       const rowNumber = index + 2 // +2 because index starts at 0 and we have header row
       
+      // Support both LeadHoop format and legacy format
+      const firstName = row.FIRSTNAME?.trim() || ''
+      const lastName = row.LASTNAME?.trim() || ''
+      const name = row.name?.trim() || (firstName && lastName ? `${firstName} ${lastName}` : '')
+      const email = row.EMAIL?.trim() || row.email?.trim() || ''
+      const phone = row.PHONE1?.trim() || row.phone?.trim() || ''
+      const company = row.COMPANY?.trim() || row.company?.trim() || ''
+      const status = row.STATUS?.trim() || row.status?.trim() || 'New'
+      
       // Validate required fields
-      if (!row.name || row.name.trim() === '') {
-        errors.push({ row: rowNumber, field: 'name', message: 'Name is required' })
+      if (!name && !firstName) {
+        errors.push({ row: rowNumber, field: 'name', message: 'Name or FIRSTNAME is required' })
       }
       
-      if (!row.email || row.email.trim() === '') {
+      if (!email) {
         errors.push({ row: rowNumber, field: 'email', message: 'Email is required' })
-      } else if (!validateEmail(row.email.trim())) {
+      } else if (!validateEmail(email)) {
         errors.push({ row: rowNumber, field: 'email', message: 'Invalid email format' })
       }
       
@@ -61,11 +96,38 @@ export default function UploadPage() {
       const hasRowErrors = errors.some(err => err.row === rowNumber)
       if (!hasRowErrors) {
         validLeads.push({
-          name: row.name?.trim() || '',
-          email: row.email?.trim() || '',
-          phone: row.phone?.trim() || '',
-          company: row.company?.trim() || '',
-          status: row.status?.trim() || 'New',
+          name: name || `${firstName} ${lastName}`.trim(),
+          email: email,
+          phone: phone,
+          company: company,
+          status: status,
+          // Include all LeadHoop fields
+          firstName: firstName,
+          lastName: lastName,
+          address: row.ADDRESS?.trim() || '',
+          address2: row.ADDRESS2?.trim() || '',
+          city: row.CITY?.trim() || '',
+          state: row.STATE?.trim() || '',
+          zipCode: row.ZIP?.trim() || '',
+          gender: row.GENDER?.trim() || '',
+          dateOfBirth: row.DOB?.trim() || '',
+          ipAddress: row.IP?.trim() || '',
+          subId2: row.SUBID2?.trim() || '',
+          signupUrl: row.SIGNUP_URL?.trim() || '',
+          consentUrl: row.CONSENT_URL?.trim() || '',
+          educationLevel: row.EDUCATION_LEVEL?.trim() || '',
+          graduationYear: row.GRAD_YEAR?.trim() || '',
+          startDate: row.START_DATE?.trim() || '',
+          militaryType: row.MILITARY_TYPE?.trim() || '',
+          campusType: row.CAMPUS_TYPE?.trim() || '',
+          areaStudyIds: row.AREA_STUDY_IDS?.trim() || '',
+          levelOfInterest: row.LEVEL_OF_INTEREST?.trim() || '',
+          internetPc: row.INTERNET_PC?.trim() || '',
+          usCitizen: row.US_CITIZEN?.trim() || '',
+          rnLicense: row.RN_LICENSE?.trim() || '',
+          teachingLicense: row.TEACHING_LICENSE?.trim() || '',
+          enrolledStatus: row.ENROLLED_STATUS?.trim() || '',
+          testField: row.TEST?.trim() || ''
         })
       }
     })
@@ -200,12 +262,12 @@ export default function UploadPage() {
   }
 
   const downloadTemplate = () => {
-    const template = 'name,email,phone,company,status\nJohn Doe,john@example.com,555-0123,Acme Corp,New\nJane Smith,jane@example.com,555-0456,Tech Solutions,Contacted'
+    const template = 'FIRSTNAME,LASTNAME,EMAIL,PHONE1,TEST,ADDRESS,ADDRESS2,CITY,STATE,ZIP,GENDER,DOB,IP,SUBID2,SIGNUP_URL,CONSENT_URL,EDUCATION_LEVEL,GRAD_YEAR,START_DATE,MILITARY_TYPE,CAMPUS_TYPE,AREA_STUDY_IDS,LEVEL_OF_INTEREST,INTERNET_PC,US_CITIZEN,RN_LICENSE,TEACHING_LICENSE,ENROLLED_STATUS,COMPANY,STATUS\nJohn,Doe,john@example.com,555-0123,Test Value,123 Main St,Apt 1,City,CA,90210,Male,1990-01-01,192.168.1.1,SUB123,https://signup.com,https://consent.com,Bachelor,2020,2021-01-01,Army,Online,AREA123,High,Yes,Yes,Yes,Yes,Active,Acme Corp,New\nJane,Smith,jane@example.com,555-0456,Test Value,456 Oak Ave,Suite 2,Town,NY,10001,Female,1985-05-15,192.168.1.2,SUB456,https://signup.com,https://consent.com,Master,2018,2019-01-01,Navy,Campus,AREA456,Medium,Yes,Yes,No,No,Active,Tech Solutions,Contacted'
     const blob = new Blob([template], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'leads-template.csv'
+    a.download = 'leadhoop-template.csv'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -478,18 +540,47 @@ export default function UploadPage() {
 
         {/* Instructions */}
         <div className="mt-8 bg-gray-50 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">CSV Format Requirements</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">LeadHoop CSV Format Requirements</h3>
           <div className="text-sm text-gray-600 space-y-2">
-            <p>Your CSV file should include the following columns:</p>
-            <ul className="list-disc list-inside ml-4 space-y-1">
-              <li><strong>name</strong> - Lead's full name</li>
-              <li><strong>email</strong> - Lead's email address</li>
-              <li><strong>phone</strong> - Lead's phone number (optional)</li>
-              <li><strong>company</strong> - Lead's company name (optional)</li>
-              <li><strong>status</strong> - Lead status (e.g., "New", "Contacted", "Qualified")</li>
-            </ul>
+            <p>Your CSV file should include the following LeadHoop-compatible columns:</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li><strong>FIRSTNAME</strong> - Lead's first name</li>
+                <li><strong>LASTNAME</strong> - Lead's last name</li>
+                <li><strong>EMAIL</strong> - Lead's email address</li>
+                <li><strong>PHONE1</strong> - Lead's phone number</li>
+                <li><strong>ADDRESS</strong> - Street address</li>
+                <li><strong>ADDRESS2</strong> - Apartment/Suite</li>
+                <li><strong>CITY</strong> - City</li>
+                <li><strong>STATE</strong> - State</li>
+                <li><strong>ZIP</strong> - ZIP code</li>
+                <li><strong>GENDER</strong> - Gender</li>
+                <li><strong>DOB</strong> - Date of birth</li>
+                <li><strong>IP</strong> - IP address</li>
+                <li><strong>SUBID2</strong> - Sub ID</li>
+                <li><strong>SIGNUP_URL</strong> - Signup URL</li>
+                <li><strong>CONSENT_URL</strong> - Consent URL</li>
+              </ul>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li><strong>EDUCATION_LEVEL</strong> - Education level</li>
+                <li><strong>GRAD_YEAR</strong> - Graduation year</li>
+                <li><strong>START_DATE</strong> - Start date</li>
+                <li><strong>MILITARY_TYPE</strong> - Military type</li>
+                <li><strong>CAMPUS_TYPE</strong> - Campus type</li>
+                <li><strong>AREA_STUDY_IDS</strong> - Area of study IDs</li>
+                <li><strong>LEVEL_OF_INTEREST</strong> - Interest level</li>
+                <li><strong>INTERNET_PC</strong> - Internet/PC access</li>
+                <li><strong>US_CITIZEN</strong> - US citizen status</li>
+                <li><strong>RN_LICENSE</strong> - RN license</li>
+                <li><strong>TEACHING_LICENSE</strong> - Teaching license</li>
+                <li><strong>ENROLLED_STATUS</strong> - Enrollment status</li>
+                <li><strong>COMPANY</strong> - Company name</li>
+                <li><strong>STATUS</strong> - Lead status</li>
+                <li><strong>TEST</strong> - Test field</li>
+              </ul>
+            </div>
             <p className="mt-4">
-              <strong>Example:</strong> name,email,phone,company,status
+              <strong>Download the template above</strong> to get started with the correct format.
             </p>
           </div>
         </div>
