@@ -20,7 +20,8 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/auth/login', {
+      // Use demo login endpoint for stability
+      const response = await fetch('/api/auth/demo-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
