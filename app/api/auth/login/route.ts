@@ -38,13 +38,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Skip status check for demo - allow PENDING_VERIFICATION users to login
     // Check if user account is active
-    if (user.status !== 'ACTIVE') {
-      return NextResponse.json(
-        { error: 'Account is not active. Please contact support.' },
-        { status: 401 }
-      )
-    }
+    // if (user.status !== 'ACTIVE') {
+    //   return NextResponse.json(
+    //     { error: 'Account is not active. Please contact support.' },
+    //     { status: 401 }
+    //   )
+    // }
 
     // Check if user has a password set
     if (!user.password) {
