@@ -5,13 +5,9 @@ import Link from 'next/link'
 import { Bot, Users, Phone, CheckCircle, Upload, BarChart3, Settings, LogOut, TrendingUp, Clock, AlertCircle, RefreshCw, Zap } from 'lucide-react'
 
 interface DashboardStats {
-  totalLeads: number
-  pendingCalls: number
-  confirmedLeads: number
-  completedCalls: number
-  todayCalls: number
-  successRate: number
-  averageCallDuration: number
+  totalLeadsInSystem: number
+  leadsLoadedLast24h: number
+  leadsPushedToLeadHoop24h: number
   lastUpdated: string
 }
 
@@ -28,13 +24,9 @@ interface RecentLead {
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
-    totalLeads: 1234,
-    pendingCalls: 89,
-    confirmedLeads: 856,
-    completedCalls: 742,
-    todayCalls: 47,
-    successRate: 68.5,
-    averageCallDuration: 4.2,
+    totalLeadsInSystem: 1234,
+    leadsLoadedLast24h: 89,
+    leadsPushedToLeadHoop24h: 156,
     lastUpdated: new Date().toLocaleTimeString()
   })
 
@@ -91,8 +83,8 @@ export default function DashboardPage() {
     // Update stats with some random variation
     setStats(prev => ({
       ...prev,
-      pendingCalls: Math.max(0, prev.pendingCalls + Math.floor(Math.random() * 6) - 3),
-      todayCalls: prev.todayCalls + Math.floor(Math.random() * 3),
+      leadsLoadedLast24h: Math.max(0, prev.leadsLoadedLast24h + Math.floor(Math.random() * 6) - 3),
+      leadsPushedToLeadHoop24h: Math.max(0, prev.leadsPushedToLeadHoop24h + Math.floor(Math.random() * 4) - 2),
       lastUpdated: new Date().toLocaleTimeString()
     }))
     
@@ -107,37 +99,29 @@ export default function DashboardPage() {
 
   const dashboardCards = [
     {
-      name: 'Total Leads',
-      value: stats.totalLeads.toLocaleString(),
+      name: 'Total Leads in System',
+      value: stats.totalLeadsInSystem.toLocaleString(),
       change: '+12%',
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50'
     },
     {
-      name: 'Pending Calls',
-      value: stats.pendingCalls.toString(),
-      change: '-3%',
-      icon: Phone,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50'
-    },
-    {
-      name: 'Confirmed',
-      value: stats.confirmedLeads.toLocaleString(),
-      change: '+8%',
-      icon: CheckCircle,
+      name: 'Leads Loaded (24h)',
+      value: stats.leadsLoadedLast24h.toString(),
+      change: '+' + stats.leadsLoadedLast24h + ' today',
+      icon: Upload,
       color: 'text-green-600',
       bgColor: 'bg-green-50'
     },
     {
-      name: 'Today\'s Calls',
-      value: stats.todayCalls.toString(),
-      change: '+15%',
-      icon: TrendingUp,
+      name: 'Pushed to LeadHoop (24h)',
+      value: stats.leadsPushedToLeadHoop24h.toString(),
+      change: '+' + stats.leadsPushedToLeadHoop24h + ' today',
+      icon: Zap,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50'
-    },
+    }
   ]
 
   const getStatusColor = (status: string) => {
@@ -194,6 +178,10 @@ export default function DashboardPage() {
                   <Upload className="text-gray-400 mr-3 h-5 w-5" />
                   Upload Leads
                 </Link>
+                <Link href="/dashboard/leads" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
+                  <Users className="text-gray-400 mr-3 h-5 w-5" />
+                  All Leads
+                </Link>
                 <Link href="/dashboard/leadhoop" className="border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium border-l-4">
                   <Zap className="text-gray-400 mr-3 h-5 w-5" />
                   LeadHoop
@@ -235,7 +223,7 @@ export default function DashboardPage() {
               </div>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                 {/* Enhanced Stats */}
-                <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {dashboardCards.map((card) => (
                     <div key={card.name} className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
                       <div className="p-5">
@@ -264,6 +252,17 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* View All Leads Button */}
+                <div className="mt-6 text-center">
+                  <Link
+                    href="/dashboard/leads"
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <Users className="mr-2 h-5 w-5" />
+                    View All Leads
+                  </Link>
                 </div>
 
                 {/* Analytics Row */}
