@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
+    
+    console.log('Demo login attempt:', { email, password })
 
-    // Demo credentials for your presentation
-    if (email === 'demo@mergemedia.ai' && password === 'demo123') {
+    // Demo credentials for your presentation - accept both email formats
+    if ((email === 'demo@mergemedia.ai' || email === 'demo@mergeleads.ai') && password === 'demo123') {
       const sessionData = {
         userId: 'demo-user-id',
         email: 'demo@mergemedia.ai',
