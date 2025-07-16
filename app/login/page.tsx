@@ -184,7 +184,7 @@ export default function LoginPage() {
         {/* Demo Account Info (for testing) */}
         <div className="mt-8 p-4 bg-blue-50 rounded-lg">
           <p className="text-xs text-center text-gray-600">
-            <strong>Demo Account:</strong> demo@mergeleads.ai / demo123
+            <strong>Demo Account:</strong> demo@mergemedia.ai / demo123
           </p>
         </div>
       </div>
